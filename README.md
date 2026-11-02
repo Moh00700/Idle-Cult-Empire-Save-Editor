@@ -10,11 +10,17 @@ save as plain JSON `*.slot` files, so no special tools are needed.
 
 ## What it does
 
-| File | Change |
-|---|---|
-| `Trade.slot` | Sets the premium currency (`Hard`) |
-| `Location_City.slot` | Sets all resources (Wood, Stone, Board, BonesBlock, Potion, Potion2, SoulCrystal, SoulCrystal2, Book, MagicScrolls, Lamp, Wax, EvilHoney, Mushroom, Mushroom2), Matter and Faith. Optionally unlocks all islands |
-| `Ads.slot` | Turns on `BypassInterstitial` and `BypassRewarded` |
+Nothing is changed unless you ask for it. Every edit is its own option.
+
+| Option | File | Effect |
+|---|---|---|
+| `--list` | all | Show current values and exit (changes nothing) |
+| `--hard N` | `Trade.slot` | Set the premium currency |
+| `--wood N`, `--stone N`, `--board N`, `--bonesblock N`, `--potion N`, `--potion2 N`, `--soulcrystal N`, `--soulcrystal2 N`, `--book N`, `--magicscrolls N`, `--lamp N`, `--wax N`, `--evilhoney N`, `--mushroom N`, `--mushroom2 N`, `--matter N`, `--faith N` | `Location_City.slot` | Set that one resource |
+| `--all-resources N` | `Location_City.slot` | Set every resource above to N (individual options win) |
+| `--island NAME` | `Location_City.slot` | Unlock one island (repeatable) |
+| `--all-islands` | `Location_City.slot` | Unlock every locked island (may skip story progression) |
+| `--no-ads` | `Ads.slot` | Turn on `BypassInterstitial` and `BypassRewarded` |
 
 ## Requirements
 
@@ -24,25 +30,20 @@ save as plain JSON `*.slot` files, so no special tools are needed.
 
 1. **Close the game completely** (swipe it away from recent apps).
 2. Copy the game's `*.slot` files to a folder (see *Finding your save files*).
-3. Run:
+3. Run the options you want:
 
 ```bash
-python3 idle_editor.py /path/to/slot_folder
+python3 idle_editor.py slots --list
+python3 idle_editor.py slots --hard 999999
+python3 idle_editor.py slots --wood 1e9 --stone 5e8
+python3 idle_editor.py slots --all-resources 1e9
+python3 idle_editor.py slots --island PotionIsland --island LibraryIsland
+python3 idle_editor.py slots --all-islands
+python3 idle_editor.py slots --no-ads
 ```
 
-Options:
-
-| Option | Default | Meaning |
-|---|---|---|
-| `--hard N` | `999999` | Premium currency amount |
-| `--resource N` | `1e9` | Amount for each resource |
-| `--islands` | off | Also unlock all locked islands (may skip story progression) |
-
-Example:
-
-```bash
-python3 idle_editor.py ./slots --islands --hard 500000 --resource 5e8
-```
+Options can be combined in one command. Island names are case-insensitive;
+`--list` shows them all.
 
 4. Copy the edited files back to the game's folder and start the game.
 
