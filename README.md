@@ -1,85 +1,105 @@
 # Idle Cult Empire Save Editor
 
-A small Python script that edits the local save files of the Android game
-**Idle Cult Empire** (`com.wa.cult.empire.tycoon.idle.game`). The game stores its
-save as plain JSON `*.slot` files, so no special tools are needed.
+A lightweight Python tool for editing local save files of **Idle Cult Empire**
+(`com.wa.cult.empire.tycoon.idle.game`) on Android. Set currency, resources, unlock
+islands and enable ad-bypass flags with a single command.
 
-> For single-player use only. Not affiliated with the game's developer.
-> Editing saves can corrupt your progress, so **always keep a backup**.
-> Use at your own risk.
+- No dependencies, only Python 3.7+
+- Automatic backups before any change
+- Every edit is optional and independent
 
-## What it does
+> **Disclaimer:** For offline, single-player use only. Not affiliated with the
+> game's developer. Provided as is. Always keep a backup of your save.
 
-Nothing is changed unless you ask for it. Every edit is its own option.
-
-| Option | File | Effect |
-|---|---|---|
-| `--list` | all | Show current values and exit (changes nothing) |
-| `--hard N` | `Trade.slot` | Set the premium currency |
-| `--wood N`, `--stone N`, `--board N`, `--bonesblock N`, `--potion N`, `--potion2 N`, `--soulcrystal N`, `--soulcrystal2 N`, `--book N`, `--magicscrolls N`, `--lamp N`, `--wax N`, `--evilhoney N`, `--mushroom N`, `--mushroom2 N`, `--matter N`, `--faith N` | `Location_City.slot` | Set that one resource |
-| `--all-resources N` | `Location_City.slot` | Set every resource above to N (individual options win) |
-| `--island NAME` | `Location_City.slot` | Unlock one island (repeatable) |
-| `--all-islands` | `Location_City.slot` | Unlock every locked island (may skip story progression) |
-| `--no-ads` | `Ads.slot` | Turn on `BypassInterstitial` and `BypassRewarded` |
-
-## Requirements
-
-- Python 3.7+ (no extra packages)
-
-## Usage
-
-1. **Close the game completely** (swipe it away from recent apps).
-2. Copy the game's `*.slot` files to a folder (see *Finding your save files*).
-3. Run the options you want:
+## Quick start
 
 ```bash
+# 1. See your current values (changes nothing)
 python3 idle_editor.py slots --list
-python3 idle_editor.py slots --hard 999999
-python3 idle_editor.py slots --wood 1e9 --stone 5e8
-python3 idle_editor.py slots --all-resources 1e9
-python3 idle_editor.py slots --island PotionIsland --island LibraryIsland
-python3 idle_editor.py slots --all-islands
-python3 idle_editor.py slots --no-ads
+
+# 2. Make your edits
+python3 idle_editor.py slots --hard 999999 --all-resources 1e9 --no-ads
 ```
 
-Options can be combined in one command. Island names are case-insensitive;
-`--list` shows them all.
+`slots` is the folder containing your copied `.slot` files. See
+[Getting your save files](#getting-your-save-files).
 
-4. Copy the edited files back to the game's folder and start the game.
+## Options
 
-A `.bak` copy of every file is made the first time it is edited. Re-running never
-overwrites that backup. To undo everything, rename the `.bak` files back.
+Nothing is changed unless you pass an option. Options can be combined.
 
-## Finding your save files
+| Option | Description |
+|---|---|
+| `--list` | Show current values and exit |
+| `--hard N` | Set the premium currency |
+| `--all-resources N` | Set every resource to `N` |
+| `--wood N`, `--stone N`, ... | Set a single resource (see below) |
+| `--island NAME` | Unlock one island (repeatable) |
+| `--all-islands` | Unlock every locked island |
+| `--no-ads` | Enable the ad-bypass flags |
 
-- **Rooted:** `/data/data/com.wa.cult.empire.tycoon.idle.game/files/`
-- **Unrooted:** try `Android/data/com.wa.cult.empire.tycoon.idle.game/files/`
-  on internal storage (Android 11+ restricts this folder; a file manager with
-  Shizuku support can access it).
+**Resources:** `wood`, `stone`, `board`, `bonesblock`, `potion`, `potion2`,
+`soulcrystal`, `soulcrystal2`, `book`, `magicscrolls`, `lamp`, `wax`, `evilhoney`,
+`mushroom`, `mushroom2`, `matter`, `faith`.
 
-Look for files ending in `.slot`.
+**Islands:** names are case-insensitive. Run `--list` to see them all.
 
-## Running on the phone (Termux)
+### Examples
+
+```bash
+python3 idle_editor.py slots --wood 1e9 --stone 5e8
+python3 idle_editor.py slots --island PotionIsland --island LibraryIsland
+python3 idle_editor.py slots --all-islands
+```
+
+## Getting your save files
+
+The tool uses up to three files from the game's data folder:
+
+| File | Used for |
+|---|---|
+| `Trade.slot` | Premium currency |
+| `Location_City.slot` | Resources and islands |
+| `Ads.slot` | Ad-bypass flags (appears after the game has run for a while) |
+
+Missing files are skipped.
+
+**Location**
+
+- Rooted: `/data/data/com.wa.cult.empire.tycoon.idle.game/files/`
+- Unrooted: `Android/data/com.wa.cult.empire.tycoon.idle.game/files/` on internal
+  storage (Android 11+ restricts this folder; use a file manager with Shizuku access)
+
+## Workflow
+
+1. Close the game completely.
+2. Copy the `.slot` files into a folder.
+3. Run the tool with the options you want.
+4. Copy the edited files back, replacing the originals.
+5. Start the game.
+
+Running on the phone with [Termux](https://termux.dev):
 
 ```bash
 pkg install python
-python3 idle_editor.py /sdcard/slots
+python3 idle_editor.py /sdcard/slots --all-resources 1e9
 ```
+
+## Backups and undo
+
+The first time a file is changed, a copy is saved next to it as `<name>.slot.bak`.
+Re-running never overwrites that backup. To undo, rename the `.bak` files back.
 
 ## Troubleshooting
 
-- **A file is skipped:** the script prints "not found" and continues. `Ads.slot`
-  only appears after the game has been running for a while.
-- **Premium currency resets to 0:** the game keeps a `HardHistory` log in
-  `Trade.slot`. If a plain edit is rejected, the log may need to match the new
-  balance.
-- **Ads still show:** the bypass flags may be ignored. Blocking ads with Private
-  DNS (`dns.adguard-dns.com`) is a fallback.
-- **Resources don't show up:** resource names are inferred from the game's own
-  keys and may not all be used. Open an issue with the file attached.
-- **Game crashes or resets the save:** restore the `.bak` files.
+| Problem | Fix |
+|---|---|
+| "file not found, skipped" | Check the folder path. `Ads.slot` only exists after the game has run a while |
+| Premium currency resets to 0 | The game keeps a history log in `Trade.slot`. A plain edit may be rejected |
+| Ads still show | The flags may be ignored. Private DNS (`dns.adguard-dns.com`) is a fallback |
+| A resource doesn't change | Not every resource may be used by the game. Open an issue with the file attached |
+| Game crashes or resets the save | Restore the `.bak` files |
 
-## Disclaimer
+## License
 
-Provided as is, without warranty. Do not use it in any online or competitive
-mode.
+MIT, see [LICENSE](LICENSE).
