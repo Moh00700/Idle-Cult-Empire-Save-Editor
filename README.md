@@ -100,6 +100,3 @@ Re-running never overwrites that backup. To undo, rename the `.bak` files back.
 | A resource doesn't change | Not every resource may be used by the game. Open an issue with the file attached |
 | Game crashes or resets the save | Restore the `.bak` files |
 
-## 📄 License
-
-MIT, see [LICENSE](LICENSE).
